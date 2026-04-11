@@ -1,0 +1,8 @@
+..............                                                           [100%]
+=============================== warnings summary ===============================
+../../../opt/pyvenv/lib/python3.13/site-packages/ddtrace/internal/module.py:313
+  /opt/pyvenv/lib/python3.13/site-packages/ddtrace/internal/module.py:313: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    self.loader.exec_module(module)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+14 passed, 1 warning in 1.13s

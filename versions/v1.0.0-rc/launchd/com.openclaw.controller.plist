@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.openclaw.controller</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>source CONTROLLER_DIR/.venv/bin/activate &amp;&amp; cd CONTROLLER_DIR &amp;&amp; python -m controller.main</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>CONTROLLER_DIR</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PYTHONPATH</key>
+        <string>CONTROLLER_DIR</string>
+        <key>CONTROLLER_HOST</key>
+        <string>0.0.0.0</string>
+        <key>CONTROLLER_PORT</key>
+        <string>8080</string>
+        <key>LOG_LEVEL</key>
+        <string>INFO</string>
+    </dict>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+    
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    
+    <key>StandardOutPath</key>
+    <string>CONTROLLER_DIR/runtime/logs/controller.launchd.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>CONTROLLER_DIR/runtime/logs/controller.launchd.error.log</string>
+    
+    <key>ProcessType</key>
+    <string>Background</string>
+    
+    <key>LowPriorityIO</key>
+    <false/>
+    
+    <key>Nice</key>
+    <integer>0</integer>
+</dict>
+</plist>
