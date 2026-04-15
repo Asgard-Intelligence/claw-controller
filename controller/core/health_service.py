@@ -106,6 +106,14 @@ class RouteHealthService:
 
         if validation.kind in {ValidationKind.TRANSPORT, ValidationKind.ENDPOINT} and not validation.ok:
             unreachable = validation.kind == ValidationKind.TRANSPORT
+            host_reachable = False if unreachable else True
+            runtime_reachable = False if unreachable else True
+
+            if validation.preferred_api_dialect is not None:
+                host_reachable = True
+                runtime_reachable = True
+                unreachable = False
+
             return RouteHealthSnapshot(
                 route_key=route_key,
                 status=HealthState.UNREACHABLE if unreachable else HealthState.DEGRADED,
@@ -114,8 +122,8 @@ class RouteHealthService:
                 failure_message=validation.message,
                 validated_model_catalog=validation.catalog_checked,
                 preferred_api_dialect=validation.preferred_api_dialect,
-                host_reachable=False if unreachable else True,
-                runtime_reachable=False if unreachable else True,
+                host_reachable=host_reachable,
+                runtime_reachable=runtime_reachable,
             )
 
         # Health is separate from validation: probe health endpoint now.

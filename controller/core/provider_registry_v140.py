@@ -149,6 +149,38 @@ class ProviderRegistryV140:
     def find_candidate_routes(self, requirements: RoutingRequirements) -> List[RouteTarget]:
         candidates: List[RouteTarget] = []
 
+        if requirements.provider_hint:
+            hinted_routes = self.get_routes_for_provider(requirements.provider_hint)
+            try:
+                print(
+                    "REGISTRY_HINT provider_hint=%r hinted_routes=%r estimated_prompt_tokens=%r"
+                    % (requirements.provider_hint, [r.route_key for r in hinted_routes], requirements.estimated_prompt_tokens),
+                    flush=True,
+                )
+            except Exception:
+                pass
+            for route in hinted_routes:
+                provider = self.get_provider(route.provider_id)
+                try:
+                    print(
+                        "REGISTRY_HINT_ROUTE route=%r enabled=%r passes=%r"
+                        % (
+                            route.route_key,
+                            (None if not provider else provider.enabled),
+                            self._route_meets_requirements(route, requirements),
+                        ),
+                        flush=True,
+                    )
+                except Exception:
+                    pass
+                if provider and not provider.enabled:
+                    continue
+                if not self._route_meets_requirements(route, requirements):
+                    continue
+                candidates.append(route)
+            if candidates:
+                return candidates
+
         for route in self.list_routes(enabled_only=True):
             if not self._route_meets_requirements(route, requirements):
                 continue
@@ -172,6 +204,25 @@ class ProviderRegistryV140:
     def _route_meets_requirements(self, route: RouteTarget, requirements: RoutingRequirements) -> bool:
         caps = route.capabilities_snapshot
 
+        try:
+            print(
+                "REGISTRY_REQUIREMENTS route=%r tools=%r vision=%r json=%r stream=%r supports_tools=%r supports_vision=%r supports_json=%r supports_stream=%r"
+                % (
+                    route.route_key,
+                    requirements.requires_tools,
+                    requirements.requires_vision,
+                    requirements.requires_json_mode,
+                    requirements.requires_streaming,
+                    caps.get("supports_tools", False),
+                    caps.get("supports_vision", False),
+                    caps.get("supports_json_mode", False),
+                    caps.get("supports_streaming", False),
+                ),
+                flush=True,
+            )
+        except Exception:
+            pass
+
         if requirements.requires_tools and not caps.get("supports_tools", False):
             return False
         if requirements.requires_vision and not caps.get("supports_vision", False):
@@ -181,7 +232,24 @@ class ProviderRegistryV140:
         if requirements.requires_streaming and not caps.get("supports_streaming", False):
             return False
 
-        if int(caps.get("context_window", 0)) < requirements.estimated_prompt_tokens:
+        context_window = int(caps.get("context_window", 0))
+        if context_window < requirements.estimated_prompt_tokens:
+            try:
+                print(
+                    "REGISTRY_CONTEXT_GATE route=%r provider_hint=%r context_window=%r estimated=%r allow=%r"
+                    % (
+                        route.route_key,
+                        requirements.provider_hint,
+                        context_window,
+                        requirements.estimated_prompt_tokens,
+                        bool(requirements.provider_hint and route.provider_id == requirements.provider_hint),
+                    ),
+                    flush=True,
+                )
+            except Exception:
+                pass
+            if requirements.provider_hint and route.provider_id == requirements.provider_hint:
+                return True
             return False
 
         return True

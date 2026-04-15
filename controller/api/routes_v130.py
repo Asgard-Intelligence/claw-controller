@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import traceback
 import time
 import uuid
 from typing import Any, Dict, Optional
@@ -160,7 +161,7 @@ async def chat_completions(
 
         requirements = request_normalizer.build_requirements(
             canonical_request=canonical_request,
-            provider_hint=x_pin_provider or session.pinned_provider,
+            provider_hint=x_pin_provider or session.pinned_provider or (settings_obj.DEFAULT_PROVIDER if settings_obj else None),
             model_hint=x_pin_model,
             routing_mode=routing_mode,
         )
@@ -170,6 +171,10 @@ async def chat_completions(
 
         decision = await hybrid_router.select_route(session, requirements)
         route_chain = hybrid_router.build_route_chain(decision)
+        try:
+            print(f"ROUTES_V130_PRE_EXEC request_id={request_id} route_chain={route_chain!r}", flush=True)
+        except Exception:
+            pass
 
         result, execution_report = await execution_engine.execute(
             canonical_request=canonical_request,
@@ -273,6 +278,11 @@ async def chat_completions(
         raise
     except Exception as exc:
         logger.exception("[%s] Unhandled error", request_id)
+        try:
+            print(f"ROUTES_V130_UNHANDLED request_id={request_id} exc={exc!r}", flush=True)
+            traceback.print_exc()
+        except Exception:
+            pass
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 

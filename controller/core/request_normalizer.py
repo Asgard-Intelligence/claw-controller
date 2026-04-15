@@ -65,11 +65,13 @@ class RequestNormalizer:
 
         model_from_request = canonical_request.model if canonical_request.model != "controller" else None
 
+        force_plain_local = provider_hint == "ollama"
+
         return RoutingRequirements(
             estimated_prompt_tokens=self.token_estimator.estimate_messages(canonical_request.messages),
-            requires_tools=bool(canonical_request.tools),
-            requires_vision=self._requires_vision(canonical_request.messages),
-            requires_json_mode=requires_json,
+            requires_tools=False if force_plain_local else bool(canonical_request.tools),
+            requires_vision=False if force_plain_local else self._requires_vision(canonical_request.messages),
+            requires_json_mode=False if force_plain_local else requires_json,
             requires_streaming=canonical_request.stream,
             provider_hint=provider_hint,
             model_hint=model_hint or model_from_request,

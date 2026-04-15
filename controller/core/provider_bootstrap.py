@@ -262,7 +262,7 @@ def _bootstrap_from_legacy_env(registry: ProviderRegistryV140, settings: Any) ->
             supports_system_prompt=True,
             system_prompt_mode="native",
             preferred_api_dialects=[ApiDialect.OLLAMA_CHAT],
-            allowed_api_dialects=[ApiDialect.OLLAMA_CHAT, ApiDialect.OPENAI_CHAT_COMPLETIONS],
+            allowed_api_dialects=[ApiDialect.OLLAMA_CHAT],
             quality_tier="standard",
             latency_tier="low",
             cost_tier="low",

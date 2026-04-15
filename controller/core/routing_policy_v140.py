@@ -116,11 +116,11 @@ class RoutingPolicyV140:
         def hint_weight(route: RouteTarget) -> int:
             weight = 0
             if requirements.provider_hint and route.provider_id == requirements.provider_hint:
-                weight += 20
+                weight += 100
             if requirements.model_hint and route.model_id == requirements.model_hint:
                 weight += 20
             if requirements.locality_preference and route.kind == requirements.locality_preference:
-                weight += 10
+                weight += 25
             if session.last_successful_route and route.route_key == session.last_successful_route:
                 weight += 8
             return weight

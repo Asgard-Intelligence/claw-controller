@@ -87,7 +87,7 @@ class SettingsV13(BaseSettings):
     # Timeouts
     TIMEOUT_PROFILE_DEFAULT_SECONDS: float = 60.0
     TIMEOUT_PROFILE_CLOUD_DEFAULT_SECONDS: float = 60.0
-    TIMEOUT_PROFILE_LOCAL_DEFAULT_SECONDS: float = 120.0
+    TIMEOUT_PROFILE_LOCAL_DEFAULT_SECONDS: float = 300.0
 
     # Compatibility and observability
     V120_COMPATIBILITY_MODE: bool = False
